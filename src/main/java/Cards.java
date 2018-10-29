@@ -26,7 +26,7 @@ public class Cards extends ArrayList<Cards> {
     private final Rank rank;
     private final Suit suit;
 
-    private Cards(Rank rank, Suit suit) {
+    Cards(Rank rank, Suit suit) {
         this.rank = rank;
         this.suit = suit;
     }
