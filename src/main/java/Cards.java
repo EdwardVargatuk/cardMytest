@@ -3,8 +3,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
-public class Cards extends ArrayList<Cards> {
 
+public class Cards {
+
+    ArrayList<Cards> cards = new ArrayList<Cards>();
     private static Scanner scan = new Scanner(System.in);
 
     public enum Rank {
@@ -39,7 +41,8 @@ public class Cards extends ArrayList<Cards> {
         return rank + " of " + suit;
     }
 
-    private static final List<Cards> protoDeck = new ArrayList<Cards>();
+    private static List<Cards> protoDeck = new ArrayList<Cards>();
+
     static {
         for (Suit suit : Suit.values())
             for (Rank rank : Rank.values()) {
@@ -47,24 +50,30 @@ public class Cards extends ArrayList<Cards> {
             }
     }
 
-    public static ArrayList<Cards> newDeck() {
+    public static List<Cards> newDeck() {
         Collections.shuffle(protoDeck);
         return new ArrayList<Cards>(protoDeck);
     }
 
     public static int drawCard() {
-        int intValueOfDeck = (protoDeck).get(0).rank.getNumVal();
+        if ((protoDeck != null)) {
+            int intValueOfDeck = (protoDeck).get(0).rank.getNumVal();
 //        System.out.println(protoDeck);for check deck
-        protoDeck.remove(0);
+            protoDeck.remove(0);
 //        System.out.println(protoDeck);for check deck
-        return intValueOfDeck;
+
+            return intValueOfDeck;
+        }
+        return 0;
     }
 
-    public static ArrayList<Integer> drawTwoCard() {
+    public static List<Integer> drawTwoCard() {
+        final int a=2;
         ArrayList<Integer> cards = new ArrayList<Integer>();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < a; i++) {
             cards.add(drawCard());
-        } return cards;
+        }
+        return cards;
     }
 
     public static int getChoice() {
@@ -76,10 +85,11 @@ public class Cards extends ArrayList<Cards> {
             } catch (Exception e) {
                 System.out.println("This is invalid input");
             }
-        }  return choice;
+        }
+        return choice;
     }
 
-    public static int totalScore(ArrayList<Integer> cards) {
+    public static int calcTotalScore(List<Integer> cards) {
         int total = 0;
         for (int card : cards) {
             total += card;
@@ -87,15 +97,15 @@ public class Cards extends ArrayList<Cards> {
         return total;
     }
 
-    public static void outputForCheckScore(ArrayList<Integer> cards) {
+    public static void checkToContinueGameAndPrintMessage(ArrayList<Integer> cards) {
         int i = checkScore(cards);
         switch (i) {
             case 1:
-                System.out.println("You currently have score of " + totalScore(cards));
+                System.out.println("You currently have score of " + calcTotalScore(cards));
                 play(cards);
                 break;
             case 2:
-                System.out.println("Whoops, you loose because have too many points - " + totalScore(cards));
+                System.out.println("Whoops, you loose because have too many points - " + calcTotalScore(cards));
                 break;
             default:
                 break;
@@ -103,9 +113,9 @@ public class Cards extends ArrayList<Cards> {
     }
 
     public static int checkScore(ArrayList<Integer> cards) {
-        if (totalScore(cards) < 21) {
+        if (calcTotalScore(cards) < 21) {
             return 1;
-        } else if (totalScore(cards) > 21) {
+        } else if (calcTotalScore(cards) > 21) {
             return 2;
         }
         return 0;
@@ -120,32 +130,31 @@ public class Cards extends ArrayList<Cards> {
             int newCard = drawCard();
             cards.add(newCard);
             System.out.println("You drew a " + beforeRemoteCard + ".");//+ newCard
-            outputForCheckScore(cards);
+            checkToContinueGameAndPrintMessage(cards);
         } else if (plChoice == 2) {
-            System.out.println("Your final score is " + totalScore(cards));
+            System.out.println("Your final score is " + calcTotalScore(cards));
         }
     }
 
-    public static boolean ifTwentyOne(ArrayList<Integer> cards) {
-        if (totalScore(cards) == 21) return true;
-        return false;
+    public static boolean ifTwentyOne(List<Integer> cards) {
+               return (calcTotalScore(cards) == 21);
     }
 
     public static void opponentsTurn(ArrayList<Integer> cards) {
-        while (totalScore(cards) < 21) {
+        while (calcTotalScore(cards) < 21) {
             Cards beforeRemoteCard = protoDeck.get(0);
             int newCard = drawCard();
             cards.add(newCard);
-            System.out.println(beforeRemoteCard + " gives to opponent " + totalScore(cards));
+            System.out.println(beforeRemoteCard + " gives to opponent " + calcTotalScore(cards));
         }
     }
 
     public static void main(String[] args) {
-        ArrayList<Cards> c = newDeck();
+        List<Cards> c = newDeck();
         ArrayList<Integer> cardsOfPlayer = new ArrayList(drawTwoCard());
         ArrayList<Integer> cardsOfOpponent = new ArrayList(drawTwoCard());
 
-        System.out.println("You drew " + c.get(0) + " and " + c.get(1) + " what giving you a current score of " + totalScore(cardsOfPlayer));
+        System.out.println("You drew " + c.get(0) + " and " + c.get(1) + " what giving you a current score of " + calcTotalScore(cardsOfPlayer));
         if (ifTwentyOne(cardsOfPlayer)) {
             System.out.println("Congratulations, you got 21!");
             System.exit(0);
@@ -155,13 +164,13 @@ public class Cards extends ArrayList<Cards> {
             System.out.println("Congratulations, you got 21!");
             System.exit(0);
         }
-        System.out.println("\nOpponents drew " + c.get(2) + " and " + c.get(3) + " giving him a current score of " + totalScore(cardsOfOpponent));
+        System.out.println("\nOpponents drew " + c.get(2) + " and " + c.get(3) + " giving him a current score of " + calcTotalScore(cardsOfOpponent));
 
         opponentsTurn(cardsOfOpponent);
         if (ifTwentyOne(cardsOfOpponent)) {
             System.out.println("Opponents win and got 21!");
         } else
-            System.out.println("Opponents final score is " + totalScore(cardsOfOpponent) + " so Opponents also lost");
+            System.out.println("Opponents final score is " + calcTotalScore(cardsOfOpponent) + " so Opponents also lost");
     }
 }
 
